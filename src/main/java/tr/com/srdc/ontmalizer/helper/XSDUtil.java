@@ -15,6 +15,7 @@ public class XSDUtil {
 
     public static Resource getXSDResource(String type) {
         switch (type) {
+            case "anySimpleType":
             case "anyURI":
                 return XSD.anyURI;
             case "base64Binary":
@@ -45,7 +46,6 @@ public class XSDUtil {
                 return XSD.hexBinary;
             case "ID":
                 return XSD.ID;
-            //		else if (type.equals("IDREFS"))
             case "IDREF":
                 return XSD.IDREF;
             case "integer":
@@ -58,7 +58,6 @@ public class XSDUtil {
                 return XSD.NCName;
             case "negativeInteger":
                 return XSD.negativeInteger;
-            //		else if (type.equals("NMTOKENS"))
             case "NMTOKEN":
                 return XSD.NMTOKEN;
             case "nonNegativeInteger":
