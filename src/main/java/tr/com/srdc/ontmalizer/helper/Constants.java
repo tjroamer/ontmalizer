@@ -16,7 +16,8 @@ public class Constants {
 	public static final String MIXED_CLASS_DEFAULT_PROP_NAME = "textContent";
 	
 	public static final String XSI_NS = "http://www.w3.org/2001/XMLSchema-instance";
-	
+	public static final String XS_NS = "http://www.w3.org/2001/XMLSchema";
+
 	public static final String ONTMALIZER_BASE_URI = "http://www.srdc.com.tr/ontmalizer#";
 	public static final String ONTMALIZER_BASE_URI_PREFIX = "dtype";
 	

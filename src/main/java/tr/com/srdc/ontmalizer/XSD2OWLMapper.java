@@ -256,7 +256,7 @@ public class XSD2OWLMapper {
                 LOGGER.warn("Namespace for schema {} is empty string.", schema);
             }
 
-            if ("http://www.w3.org/2001/XMLSchema".equals(nameSpace)) {
+            if (Constants.XS_NS.equals(nameSpace)) {
                 LOGGER.debug("Skip XMLSchema namespace");
                 continue;
             }
@@ -600,7 +600,7 @@ public class XSD2OWLMapper {
                     }
                 }
             } else if (complex.getDerivationMethod() == XSType.RESTRICTION
-                    && baseURI.equals("http://www.w3.org/2001/XMLSchema#anyType")) {
+                    && baseURI.equals(Constants.XS_NS + "#anyType")) {
                 /* For the case
 				 * <xs:complexType name="complex16">
 				 * 	<xs:sequence>

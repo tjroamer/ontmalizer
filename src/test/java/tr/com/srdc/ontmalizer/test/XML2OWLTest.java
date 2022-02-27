@@ -7,7 +7,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.Writer;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.ontmalizer.XML2OWLMapper;
@@ -149,10 +150,10 @@ public class XML2OWLTest {
 
         // This part prints the RDF data model to the specified file.
         try {
-            File f = new File("src/test/resources/output/test-instance.rdf");
+            File f = new File("src/test/resources/output/test-instance.ttl");
             f.getParentFile().mkdirs();
             FileOutputStream fout = new FileOutputStream(f);
-            generator.writeModel(fout, "RDF/XML-ABBREV");
+            generator.writeModel(fout, "Turtle");
             fout.close();
 
         } catch (Exception e) {

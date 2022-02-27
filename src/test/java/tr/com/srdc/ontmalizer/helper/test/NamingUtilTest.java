@@ -1,12 +1,11 @@
 package tr.com.srdc.ontmalizer.helper.test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 
-import org.junit.AfterClass;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
+import org.testng.annotations.AfterClass;
 import tr.com.srdc.ontmalizer.helper.NamingUtil;
 
 /**

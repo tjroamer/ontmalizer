@@ -21,8 +21,6 @@ Ontmalizer performs comprehensive transformations of XML Schemas (XSD) and XML d
 
 The state of the art open source and/or free tools for RDFizing XSD and XML are not able to handle complex schemas and XML instances such as HL7 Clinical Document Architecture (CDA) R2. Only a few commercial tools such as TopBraid Composer are successfully able to do so. However, we do not want to use commercial tools in our SALUS Project: http://www.srdc.com.tr/projects/salus/. As a result, we implemented our own solution. We make use of Sun's XSOM library for processing XML Schemas, Apache Xerces for processing XML data and Apache Jena for managing RDF data.
 
-Further information and technical details can be found in our blog post accessible at http://www.srdc.com.tr/projects/salus/blog/?p=189.
-
 ## Installation
 
 Apache Maven is required to build the Ontmalizer. Please visit http://maven.apache.org/ in order to install Maven on your system.
@@ -93,5 +91,3 @@ Similar to XSD2OWLMapper, XML2OWLMapper is able to print the output ontology ins
         e.printStackTrace();
     }
 ```
-
-Please refer to our blog post (http://www.srdc.com.tr/projects/salus/blog/?p=189) for further details.
