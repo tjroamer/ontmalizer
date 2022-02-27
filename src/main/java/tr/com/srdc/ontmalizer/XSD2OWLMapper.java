@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -82,8 +83,8 @@ public class XSD2OWLMapper {
     private OntModel ontology = null;
 
     // To number classes named Anon_# and Class_#
-    private int anonCount = 1;
     private int attrLocalSimpleTypeCount = 1;
+    private final Map<String, OntClass> anonClassMap = new HashMap<>();
 
     // To handle nodes with text content
     private Property hasValue = null;
@@ -255,6 +256,11 @@ public class XSD2OWLMapper {
                 LOGGER.warn("Namespace for schema {} is empty string.", schema);
             }
 
+            if ("http://www.w3.org/2001/XMLSchema".equals(nameSpace)) {
+                LOGGER.debug("Skip XMLSchema namespace");
+                continue;
+            }
+
             try {
                 URI uri = new URI(schema.getTargetNamespace());
                 if (uri.isAbsolute()) {
@@ -326,7 +332,11 @@ public class XSD2OWLMapper {
                     RDFS.Datatype,
                     URI + Constants.DATATYPE_SUFFIX);
                 Resource xsdResource = XSDUtil.getXSDResource(simple.getName());
-                
+                if (xsdResource != null) {
+                    // don't create new dataType for build-in XSD dataTypes
+                    return null;
+                }
+
                 if (xsdResource !=null && !"nullDatatype".equals(dataType.toString())) {
                     // Set super class to the element type
                     dataType.addSuperClass(xsdResource);
@@ -352,8 +362,8 @@ public class XSD2OWLMapper {
                         parentURI + Constants.DATATYPE_SUFFIX);
                 LOGGER.debug("datatype: {} used RDFS.Datatype", datatype);
 
-                /**
-                 * The following part adds equivalentClass to an enumarated
+                /*
+                 * The following part adds equivalentClass to an enumerated
                  * class, if it is not added already. Like this:
                  *
                  * :simpletype1Datatype a rdfs:Datatype ; rdfs:subClassOf
@@ -386,7 +396,7 @@ public class XSD2OWLMapper {
                 return datatype;
             } else if (simple.isList() || simple.isUnion()) {
                 // To convert global union or global list simple type definitions.
-                // It will create an rdfs:Datatype which is a subclass of xs:anySimpleType.
+                // It will create a rdfs:Datatype which is a subclass of xs:anySimpleType.
                 return convertListOrUnion(URI);
             } else if (simple.isRestriction()) {
                 return convertRestriction(mainURI, simple, URI);
@@ -408,7 +418,7 @@ public class XSD2OWLMapper {
                 RDFS.Datatype,
                 URI + Constants.DATATYPE_SUFFIX);
 
-        LOGGER.debug("datatype: {} used rdf datatyep", dataType);
+        LOGGER.debug("datatype: {} used rdf datatype", dataType);
         Resource anySimpleType = ontology.getResource(XSD.getURI() + "anySimpleType");
         dataType.addSuperClass(anySimpleType);
 
@@ -496,6 +506,9 @@ public class XSD2OWLMapper {
         }
         // I did not use getResource methods because the class I am looking for may not be created yet.
         LOGGER.debug("datatype: {}, onDataType: {} both use rdf datatype", datatype, onDatatype);
+        if (onDatatype == null) {
+            return null;
+        }
         datatype.addSuperClass(onDatatype);
 
         OntClass equivClass = ontology.createOntResource(OntClass.class,
@@ -672,7 +685,7 @@ public class XSD2OWLMapper {
         if (attribute.getType().isGlobal()) {
             URI = getURI(mainURI, attribute.getType());
         } else {
-            URI = mainURI + "#Class_" + attrLocalSimpleTypeCount;
+            URI = mainURI + "#" + complexClass.getLocalName() + "-" + attribute.getName();
         }
 
         /**
@@ -749,7 +762,7 @@ public class XSD2OWLMapper {
                     }
 
                 } else if (element.getType().isComplexType()) {
-                    prop = ontology.createObjectProperty(mainURI + "#" + NamingUtil.createPropertyName(opprefix, element.getName()));
+                    prop = ontology.createObjectProperty(mainURI + "#" + NamingUtil.createPropertyName(opprefix, element.getName()) + "Ref");
                     // TODO: Mustafa: How will this be possible?
                     if (element.getType().getTargetNamespace().equals(XSDDatatype.XSD)) {
                         if (element.getType().getName().equals("anyType")) {
@@ -779,22 +792,23 @@ public class XSD2OWLMapper {
                         parent.addSuperClass(ontology.createAllValuesFromRestriction(null,
                                 prop, resource));
                     } else if (element.getType().isLocal()) {
-                        OntClass anonClass = ontology.createClass(mainURI
-                                + "#"
-                                + "Anon_"
-                                + anonCount++);
-                        LOGGER.debug("Adding anon class: {}", anonClass);
-                        anonClass.addSuperClass(ontology.createClass(mainURI
-                                + "#"
-                                + "Anon"));
-                        parent.addSuperClass(ontology.createAllValuesFromRestriction(null,
-                                prop,
-                                anonClass));
+                        OntClass anonClass = anonClassMap.get(element.getName());
+                        if (anonClass == null) {
+                            anonClass = ontology.createClass(mainURI
+                                    + "#"
+                                    + element.getName());
+                            LOGGER.debug("Adding anon class: {}", anonClass);
+                            anonClassMap.put(element.getName(), anonClass);
 
-                        if (element.getType().isSimpleType()) {
-                            convertSimpleType(mainURI, element.getType().asSimpleType(), anonClass.getURI());
-                        } else if (element.getType().isComplexType()) {
-                            convertComplexType(mainURI, element.getType().asComplexType(), anonClass.getURI());
+                            parent.addSuperClass(ontology.createAllValuesFromRestriction(null,
+                                    prop,
+                                    anonClass));
+
+                            if (element.getType().isSimpleType()) {
+                                convertSimpleType(mainURI, element.getType().asSimpleType(), anonClass.getURI());
+                            } else if (element.getType().isComplexType()) {
+                                convertComplexType(mainURI, element.getType().asComplexType(), anonClass.getURI());
+                            }
                         }
                     }
 
