@@ -4,15 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.testng.annotations.AfterClass;
 import tr.com.srdc.ontmalizer.helper.NamingUtil;
 
 /**
  * @author rahmivolkan
  */
 public class NamingUtilTest {
-    private static Locale defaultLocale = Locale.getDefault();
+    private static final Locale defaultLocale = Locale.getDefault();
     
 	@Test
 	public void testCreatePropertyName() {
@@ -40,7 +40,7 @@ public class NamingUtilTest {
 		assertEquals("preIlaç", NamingUtil.createPropertyName("pre", "ılaç"));
 	}
 
-    @AfterClass
+    @AfterAll
     public static void restoreLocale() {
         Locale.setDefault(defaultLocale);
     }

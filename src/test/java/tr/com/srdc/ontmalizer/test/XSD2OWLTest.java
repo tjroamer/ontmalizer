@@ -28,7 +28,7 @@ public class XSD2OWLTest {
             "salus-common-xsd/salus-cim.xsd",
             "test/test.xsd"
     })
-    public void createCDAOntology(String xsdFileName) {
+    public void createOntology(String xsdFileName) {
 
         Path resourceDir = Paths.get("src","test", "resources");
         File xsdFile = Paths.get(resourceDir.toString(), xsdFileName).toFile();

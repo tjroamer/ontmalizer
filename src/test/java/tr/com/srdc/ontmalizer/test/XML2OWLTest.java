@@ -5,10 +5,12 @@ package tr.com.srdc.ontmalizer.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.ontmalizer.XML2OWLMapper;
@@ -21,32 +23,6 @@ import tr.com.srdc.ontmalizer.XSD2OWLMapper;
 public class XML2OWLTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XML2OWLTest.class);
-
-    @Test
-    public void createCDAOntologyInstance() {
-
-        // This part converts XML schema to OWL ontology.
-        XSD2OWLMapper mapping = new XSD2OWLMapper(new File("src/test/resources/CDA/CDA.xsd"));
-        mapping.setObjectPropPrefix("");
-        mapping.setDataTypePropPrefix("");
-        mapping.convertXSD2OWL();
-
-        // This part converts XML instance to RDF data model.
-        XML2OWLMapper generator = new XML2OWLMapper(new File("src/test/resources/CDA/SALUS-sample-full-CDA-instance.xml"), mapping);
-        generator.convertXML2OWL();
-
-        // This part prints the RDF data model to the specified file.
-        try {
-            File f = new File("src/test/resources/output/salus-cda-instance.n3");
-            f.getParentFile().mkdirs();
-            FileOutputStream fout = new FileOutputStream(f);
-            generator.writeModel(fout, "N3");
-            fout.close();
-
-        } catch (Exception e) {
-            LOGGER.error("{}", e.getMessage());
-        }
-    }
 
     @Test
     public void createFirstPrototypeCDAInstances() {
@@ -83,104 +59,36 @@ public class XML2OWLTest {
         }
     }
 
-    @Test
-    public void createSALUSCommonOntologyInstance() {
+    @ParameterizedTest
+    @CsvSource({
+            "CDA/CDA.xsd,CDA/SALUS-sample-full-CDA-instance.xml",
+            "salus-common-xsd/salus-cim.xsd,salus-common-xsd/salus-eligibility-instance.xml",
+            "salus-common-xsd/salus-cim.xsd,salus-common-xsd/salus-cim-instance.xml",
+            "test/test.xsd,test/test.xml"
+    })
+    public void createSALUSOntologyInstance(String xsdFileName, String xmlFileName) {
+        Path resourceDir = Paths.get("src","test", "resources");
 
         // This part converts XML schema to OWL ontology.
-        XSD2OWLMapper mapping = new XSD2OWLMapper(new File("src/test/resources/salus-common-xsd/salus-cim.xsd"));
+        File xsdFile = Paths.get(resourceDir.toString(), xsdFileName).toFile();
+        XSD2OWLMapper mapping = new XSD2OWLMapper(xsdFile);
         mapping.setObjectPropPrefix("");
         mapping.setDataTypePropPrefix("");
         mapping.convertXSD2OWL();
 
         // This part converts XML instance to RDF data model.
-        XML2OWLMapper generator = new XML2OWLMapper(new File("src/test/resources/salus-common-xsd/salus-cim-instance.xml"), mapping);
+        File xmlFile = Paths.get(resourceDir.toString(), xmlFileName).toFile();
+        XML2OWLMapper generator = new XML2OWLMapper(xmlFile, mapping);
         generator.convertXML2OWL();
 
         // This part prints the RDF data model to the specified file.
         try {
-            File f = new File("src/test/resources/output/salus-cim-instance.n3");
-            f.getParentFile().mkdirs();
-            FileOutputStream fout = new FileOutputStream(f);
-            generator.writeModel(fout, "N3");
-            fout.close();
-
-        } catch (Exception e) {
-            LOGGER.error("{}", e.getMessage());
-        }
-    }
-
-    @Test
-    public void createSALUSEligibilityInstance() {
-
-        // This part converts XML schema to OWL ontology.
-        XSD2OWLMapper mapping = new XSD2OWLMapper(new File("src/test/resources/salus-common-xsd/salus-cim.xsd"));
-        mapping.setObjectPropPrefix("");
-        mapping.setDataTypePropPrefix("");
-        mapping.convertXSD2OWL();
-
-        // This part converts XML instance to RDF data model.
-        XML2OWLMapper generator = new XML2OWLMapper(new File("src/test/resources/salus-common-xsd/salus-eligibility-instance.xml"), mapping);
-        generator.convertXML2OWL();
-
-        // This part prints the RDF data model to the specified file.
-        try {
-            File f = new File("src/test/resources/output/salus-eligibility-instance.n3");
-            f.getParentFile().mkdirs();
-            FileOutputStream fout = new FileOutputStream(f);
-            generator.writeModel(fout, "N3");
-            fout.close();
-
-        } catch (Exception e) {
-            LOGGER.error("{}", e.getMessage());
-        }
-    }
-
-    @Test
-    public void createTestOntologyInstance() {
-
-        // This part converts XML schema to OWL ontology.
-        XSD2OWLMapper mapping = new XSD2OWLMapper(new File("src/test/resources/test/test.xsd"));
-        mapping.setObjectPropPrefix("");
-        mapping.setDataTypePropPrefix("");
-        mapping.convertXSD2OWL();
-
-        // This part converts XML instance to RDF data model.
-        XML2OWLMapper generator = new XML2OWLMapper(new File("src/test/resources/test/test.xml"), mapping);
-        generator.convertXML2OWL();
-
-        // This part prints the RDF data model to the specified file.
-        try {
-            File f = new File("src/test/resources/output/test-instance.ttl");
+            String ttlFileName = xmlFileName.substring(0, xmlFileName.lastIndexOf('.')) + ".ttl";
+            File f = Paths.get(resourceDir.toString(), "output", ttlFileName).toFile();
             f.getParentFile().mkdirs();
             FileOutputStream fout = new FileOutputStream(f);
             generator.writeModel(fout, "Turtle");
             fout.close();
-
-        } catch (Exception e) {
-            LOGGER.error("{}", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testWriter() {
-
-        // This part converts XML schema to OWL ontology.
-        XSD2OWLMapper mapping = new XSD2OWLMapper(new File("src/test/resources/test/test.xsd"));
-        mapping.setObjectPropPrefix("");
-        mapping.setDataTypePropPrefix("");
-        mapping.convertXSD2OWL();
-
-        // This part converts XML instance to RDF data model.
-        XML2OWLMapper generator = new XML2OWLMapper(new File("src/test/resources/test/test.xml"), mapping);
-        generator.convertXML2OWL();
-
-        // This part prints the RDF data model to the specified file.
-        try {
-            File f = new File("src/test/resources/output/test-instance.rdf");
-            f.getParentFile().mkdirs();
-            Writer writer = new FileWriter(f);
-            generator.writeModel(writer, "RDF/XML-ABBREV");
-            writer.close();
 
         } catch (Exception e) {
             LOGGER.error("{}", e.getMessage());
