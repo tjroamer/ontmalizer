@@ -51,17 +51,12 @@ public class SimpleTypeRestriction {
         if (fractionDigits != null) {
             return true;
         }
-        if (whiteSpace != null) {
-            return true;
-        }
-        return false;
+        return whiteSpace != null;
     }
 
     public void initFacets(XSRestrictionSimpleType restriction) {
         ArrayList<String> en = new ArrayList<>();
-        Iterator<? extends XSFacet> i = restriction.getDeclaredFacets().iterator();
-        while (i.hasNext()) {
-            XSFacet facet = i.next();
+        for (XSFacet facet : restriction.getDeclaredFacets()) {
             if (facet.getName().equals(XSFacet.FACET_ENUMERATION)) {
                 en.add(facet.getValue().value);
             }

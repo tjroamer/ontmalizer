@@ -56,8 +56,6 @@ public class XML2OWLMapper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XML2OWLMapper.class);
 
-    // Variables for parsing XML instance
-    private DocumentBuilderFactory dbf = null;
     private DocumentBuilder db = null;
     private Document document = null;
 
@@ -78,7 +76,6 @@ public class XML2OWLMapper {
     private String baseURI = Constants.ONTMALIZER_INSTANCE_BASE_URI;
     private String baseNS = Constants.ONTMALIZER_INSTANCE_BASE_NS;
 
-//	private ArrayList<OntClass> abstractClasses 	= null;
     private ArrayList<OntClass> mixedClasses = null;
 
     private String NS = null;
@@ -143,10 +140,11 @@ public class XML2OWLMapper {
     /**
      * Initializes the XML DocumentBuilder variables
      *
-     * @throws ParserConfigurationException
+     * @throws ParserConfigurationException parser configuration failed
      */
     private void initDocumentBuilder() throws ParserConfigurationException {
-        dbf = DocumentBuilderFactory.newInstance();
+        // Variables for parsing XML instance
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setIgnoringComments(true);
         db = dbf.newDocumentBuilder();
@@ -171,7 +169,7 @@ public class XML2OWLMapper {
         count = new HashMap<>();
         ResIterator it = ontology.listResourcesWithProperty(null);
         while (it.hasNext()) {
-            Resource resource = (Resource) it.next();
+            Resource resource = it.next();
             if (resource != null && resource.getURI() != null) {
                 count.put(resource.getURI(), 1);
             }
@@ -181,15 +179,13 @@ public class XML2OWLMapper {
         //Updated to use 'setNsPrefixes' since setNsPrefix is no longer a method in Jena 3.7
         // Import all the namespace prefixes to the model
         Map<String, String> nsmap = ontology.getBaseModel().getNsPrefixMap();
-        Map<String, String> newNsMap = new HashMap<String, String>();
-        Iterator<String> keys = nsmap.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
+        Map<String, String> newNsMap = new HashMap<>();
+        for (String key : nsmap.keySet()) {
             // The default namespace (i.e. the null prefix) should always refer to baseURI in instances
             if (key.equals("")) {
                 newNsMap.put("", baseURI);
             } else {
-                newNsMap.put(key,  nsmap.get(key));
+                newNsMap.put(key, nsmap.get(key));
             }
         }
         model.setNsPrefixes(newNsMap);
@@ -279,7 +275,7 @@ public class XML2OWLMapper {
             objectType = findObjectType(subjectType, node.getLocalName(), node, false);
             if (objectType != null) {
             	LOGGER.debug("Object type: {} objectType.resource: {}", objectType, objectType.getResource());
-                /**
+                /*
                  * The type of the element might be overridden with the use of
                  * xsi:type, if the original type of the element is abstract, or
                  * a superclass. Therefore, we have to be sure about the actual
@@ -289,9 +285,9 @@ public class XML2OWLMapper {
                 LOGGER.trace("Type: {}", element.getAttribute("type"));
                 String overriddenXsiType = element.getAttributeNS(Constants.XSI_NS, "type");
                 LOGGER.trace("overridden type: {}", overriddenXsiType);
-                if (overriddenXsiType != null && !overriddenXsiType.equals("")) {
-                    String overriddenNS = null;
-                    String overriddenType = null;
+                if (!overriddenXsiType.equals("")) {
+                    String overriddenNS;
+                    String overriddenType;
                     if (overriddenXsiType.contains(":")) {
                         String[] strarr = overriddenXsiType.split(":");
                         String prefix = strarr[0];
@@ -346,7 +342,7 @@ public class XML2OWLMapper {
             // Check if mixed class
             Iterator<OntClass> it = mixedClasses.iterator();
             while (it.hasNext()) {
-                OntClass mixed = (OntClass) it.next();
+                OntClass mixed = it.next();
                 if (mixed.getURI().equals(subjectType.getURI())) {
                     break;
                 }
@@ -384,11 +380,11 @@ public class XML2OWLMapper {
         while (temp != null) {
             ExtendedIterator<OntClass> itres = temp.listSuperClasses();
             while (itres.hasNext()) {
-                OntClass rescl = (OntClass) itres.next();
+                OntClass rescl = itres.next();
                 if (rescl.isRestriction()) {
                     if (rescl.asRestriction().isAllValuesFromRestriction()) {
                         AllValuesFromRestriction avfres = rescl.asRestriction().asAllValuesFromRestriction();
-                        /**
+                        /*
                          * In some cases, a resource can be both an object and
                          * datatype property. If, at the same time the prefixes
                          * opprefix and dtpprefix are identical, then we have to
@@ -421,7 +417,7 @@ public class XML2OWLMapper {
 
             ExtendedIterator<OntClass> it = temp.listSuperClasses();
             while (it.hasNext()) {
-                OntClass superCl = (OntClass) it.next();
+                OntClass superCl = it.next();
                 if (!superCl.isRestriction() && !superCl.isEnumeratedClass()) {
                     queue.add(superCl);
                 }
@@ -438,7 +434,7 @@ public class XML2OWLMapper {
 
         if (uri.startsWith(XSDDatatype.XSD)) {
             result.setDatatype(true);
-            result.setResource(XSDUtil.getXSDResource(uri.substring(uri.lastIndexOf("#"), uri.length())));
+            result.setResource(XSDUtil.getXSDResource(uri.substring(uri.lastIndexOf("#"))));
         } else {
             OntClass cls = ontology.getOntClass(uri);
             if (cls != null && cls.getRDFType(true).getURI().equals(Constants.OWL_CLASS_URI)) {

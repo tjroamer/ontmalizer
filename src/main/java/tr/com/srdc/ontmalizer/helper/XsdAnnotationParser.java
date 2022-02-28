@@ -5,12 +5,7 @@ package tr.com.srdc.ontmalizer.helper;
 
 import com.sun.xml.xsom.parser.AnnotationContext;
 import com.sun.xml.xsom.parser.AnnotationParser;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
 /**
  * @author mustafa
@@ -27,51 +22,46 @@ public class XsdAnnotationParser extends AnnotationParser {
             private boolean parsingDocumentation = false;
 
             @Override
-            public void characters(char[] ch, int start, int length)
-                    throws SAXException {
+            public void characters(char[] ch, int start, int length) {
                 if (parsingDocumentation) {
                     documentation.append(ch, start, length);
                 }
             }
 
             @Override
-            public void endElement(String uri, String localName, String name)
-                    throws SAXException {
+            public void endElement(String uri, String localName, String name) {
                 if (localName.equals("documentation")) {
                     parsingDocumentation = false;
                 }
             }
 
             @Override
-            public void startElement(String uri, String localName, String name,
-                    Attributes atts) throws SAXException {
+            public void startElement(String uri, String localName, String name, Attributes atts) {
                 if (localName.equals("documentation")) {
                     parsingDocumentation = true;
                 }
             }
 
             @Override
-            public void endDocument() throws SAXException {
+            public void endDocument() {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void endPrefixMapping(String prefix) throws SAXException {
+            public void endPrefixMapping(String prefix) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void ignorableWhitespace(char[] ch, int start, int length)
-                    throws SAXException {
+            public void ignorableWhitespace(char[] ch, int start, int length) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void processingInstruction(String target, String data)
-                    throws SAXException {
+            public void processingInstruction(String target, String data) {
                 // TODO Auto-generated method stub
 
             }
@@ -83,20 +73,19 @@ public class XsdAnnotationParser extends AnnotationParser {
             }
 
             @Override
-            public void skippedEntity(String name) throws SAXException {
+            public void skippedEntity(String name) {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void startDocument() throws SAXException {
+            public void startDocument() {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void startPrefixMapping(String prefix, String uri)
-                    throws SAXException {
+            public void startPrefixMapping(String prefix, String uri) {
                 // TODO Auto-generated method stub
 
             }
