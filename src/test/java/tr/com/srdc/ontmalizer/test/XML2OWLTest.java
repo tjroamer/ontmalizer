@@ -5,6 +5,7 @@ package tr.com.srdc.ontmalizer.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -38,7 +39,7 @@ public class XML2OWLTest {
         if(files != null) {
 	        for (File child : files) {
 	            String inName = child.getName();
-	            String outName = inName.substring(0, inName.lastIndexOf(".")) + "-cda.n3";
+	            String outName = inName.substring(0, inName.lastIndexOf(".")) + "-cda.ttl";
 	
 	            // This part converts XML instance to RDF data model.
 	            XML2OWLMapper generator = new XML2OWLMapper(child, mapping);
@@ -49,10 +50,9 @@ public class XML2OWLTest {
 	                File f = new File("src/test/resources/output/first-prot/" + outName);
 	                f.getParentFile().mkdirs();
 	                FileOutputStream fout = new FileOutputStream(f);
-	                generator.writeModel(fout, "N3");
+	                generator.writeModel(fout, "Turtle");
 	                fout.close();
-	
-	            } catch (Exception e) {
+	            } catch (IOException e) {
 	                LOGGER.error("{}", e.getMessage());
 	            }
 	        }
@@ -89,8 +89,7 @@ public class XML2OWLTest {
             FileOutputStream fout = new FileOutputStream(f);
             generator.writeModel(fout, "Turtle");
             fout.close();
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("{}", e.getMessage());
         }
     }

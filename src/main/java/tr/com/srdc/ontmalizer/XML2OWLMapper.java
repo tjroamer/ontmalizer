@@ -26,7 +26,6 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFWriter;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.iterator.ExtendedIterator;
@@ -465,14 +464,7 @@ public class XML2OWLMapper {
      * "RDF/XML","RDF/XML-ABBREV","N-TRIPLE","N3".
      */
     public void writeModel(OutputStream out, String format) {
-        if (format.equals("RDF/XML") || format.equals("RDF/XML-ABBREV")) {
-            // This part is to add xml:base attribute to the RDF/XML and RDF/XML-ABBREV output
-            RDFWriter writer = model.getWriter(format);
-            writer.setProperty("xmlbase", baseNS);
-            writer.write(model, out, baseURI);
-        } else {
-            model.write(out, format, baseURI);
-        }
+        model.write(out, format, baseURI);
     }
 
     /**
@@ -481,14 +473,7 @@ public class XML2OWLMapper {
      * "RDF/XML","RDF/XML-ABBREV","N-TRIPLE","N3".
      */
     public void writeModel(Writer out, String format) {
-        if (format.equals("RDF/XML") || format.equals("RDF/XML-ABBREV")) {
-            // This part is to add xml:base attribute to the RDF/XML and RDF/XML-ABBREV output
-            RDFWriter writer = model.getWriter(format);
-            writer.setProperty("xmlbase", baseNS);
-            writer.write(model, out, baseURI);
-        } else {
-            model.write(out, format, baseURI);
-        }
+        model.write(out, format, baseURI);
     }
 
     /**
